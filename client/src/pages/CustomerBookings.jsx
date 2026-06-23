@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { bookings as bookingsApi, reviews as reviewsApi } from '../api';
 import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 import { formatPrice } from '../utils/currency';
 
 const statusConfig = {
@@ -255,7 +256,8 @@ export default function CustomerBookings() {
   return (
     <Layout>
       <div className="mb-8 animate-fade-in-up">
-        <h2 className="text-2xl font-bold text-gray-900">My Bookings</h2>
+        <SEO title="My Bookings" description="Track and manage your service bookings on ALLFIX." noindex />
+        <h1 className="text-2xl font-bold text-gray-900">My Bookings</h1>
         <p className="text-gray-500 text-sm mt-1.5">Track and manage your service bookings</p>
       </div>
 

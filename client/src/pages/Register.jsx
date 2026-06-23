@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 
 export default function Register() {
   const { register } = useAuth();
@@ -40,7 +41,8 @@ export default function Register() {
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Create your account</h2>
+            <SEO title="Create an Account" description="Join ALLFIX as a customer or service provider. Sign up free and start booking or offering services." noindex />
+            <h1 className="text-xl font-bold text-gray-900">Create your account</h1>
             <p className="text-gray-500 text-sm mt-1">Join the ALLFIX community</p>
           </div>
 

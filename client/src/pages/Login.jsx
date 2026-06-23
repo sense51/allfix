@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 
 export default function Login() {
   const { login, sendOtp, verifyOtp } = useAuth();
@@ -66,7 +67,8 @@ export default function Login() {
                 <path d="M2 12l10 5 10-5" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Welcome back</h2>
+            <SEO title="Sign In" description="Sign in to your ALLFIX account to manage bookings or services." noindex />
+            <h1 className="text-xl font-bold text-gray-900">Welcome back</h1>
             <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
           </div>
 

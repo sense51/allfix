@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { services as servicesApi, bookings as bookingsApi } from '../api';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 import { formatPrice } from '../utils/currency';
 
 const categoryConfig = {
@@ -86,8 +87,34 @@ export default function ServiceDetail() {
 
   const cfg = categoryConfig[service.category] || categoryConfig.car;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.title,
+    description: service.description,
+    provider: {
+      '@type': 'LocalBusiness',
+      name: service.provider_name,
+      address: service.location ? { '@type': 'PostalAddress', addressLocality: service.location } : undefined,
+    },
+    offers: {
+      '@type': 'Offer',
+      price: service.price,
+      priceCurrency: service.currency || 'USD',
+    },
+    category: service.category,
+  };
+
   return (
     <Layout>
+      <SEO
+        title={service.title}
+        description={`${service.title} — ${service.description?.slice(0, 150)}. Book ${service.provider_name} on ALLFIX.`}
+        canonical={`https://sense51.github.io/allfix/services/${service.id}`}
+      />
+      <script type="application/ld+json">
+        {JSON.stringify(jsonLd)}
+      </script>
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
           <Link to="/services" className="hover:text-brand-600 transition-colors">Services</Link>

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { services as servicesApi } from '../api';
 import Layout from '../components/Layout';
 import ServiceCard from '../components/ServiceCard';
+import SEO from '../components/SEO';
 
 const categories = [
   { key: '', label: 'All Services' },
@@ -58,7 +59,16 @@ export default function Services() {
   return (
     <Layout>
       <div className="mb-8 animate-fade-in-up">
-        <h2 className="text-2xl font-bold text-gray-900">Browse Services</h2>
+        <SEO
+          title={activeCategory
+            ? `${categories.find((c) => c.key === activeCategory)?.label || ''} Services`
+            : 'Browse Services'}
+          description={activeCategory
+            ? `Find trusted ${categories.find((c) => c.key === activeCategory)?.label || ''} service providers near you. Book in seconds.`
+            : 'Browse electrical, automotive, cleaning, computer & phone repair services. Book trusted professionals instantly.'}
+          canonical={activeCategory ? `https://sense51.github.io/allfix/services?category=${activeCategory}` : 'https://sense51.github.io/allfix/services'}
+        />
+        <h1 className="text-2xl font-bold text-gray-900">Browse Services</h1>
         <p className="text-gray-500 mt-1.5">
           {activeCategory
             ? `Showing ${categories.find((c) => c.key === activeCategory)?.label || ''} services`

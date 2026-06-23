@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import SEO from '../components/SEO';
 
 /* ── Category definitions with proper SVG icons ──────────────── */
 const categories = [
@@ -259,7 +260,12 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden bg-[#fafaf9]">
+    <>
+      <SEO
+        title="Professional Repair & Home Services"
+        canonical="https://sense51.github.io/allfix/"
+      />
+      <div className="min-h-screen relative overflow-x-hidden bg-[#fafaf9]">
       {/* Particle canvas */}
       <ParticleCanvas />
 
@@ -556,5 +562,5 @@ export default function Landing() {
         </footer>
       </div>
     </div>
-  );
+    </>);
 }

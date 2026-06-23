@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /provider/dashboard
+Disallow: /customer/bookings
+
+Sitemap: https://sense51.github.io/allfix/sitemap.xml

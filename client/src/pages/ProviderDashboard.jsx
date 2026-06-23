@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { services as servicesApi, bookings as bookingsApi, reviews as reviewsApi } from '../api';
 import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 import { CURRENCIES, formatPrice } from '../utils/currency';
 
 const statusConfig = {
@@ -342,7 +343,8 @@ export default function ProviderDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Provider Dashboard</h2>
+          <SEO title="Provider Dashboard" description="Manage your services, bookings, and reviews on ALLFIX." noindex />
+          <h1 className="text-2xl font-bold text-gray-900">Provider Dashboard</h1>
           <p className="text-gray-500 text-sm mt-1.5">Manage your services and bookings</p>
         </div>
         <button

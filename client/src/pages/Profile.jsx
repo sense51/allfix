@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -38,7 +39,8 @@ export default function Profile() {
               {user.name.charAt(0).toUpperCase()}
             </div>
           </div>
-          <h2 className="text-xl font-bold text-gray-900">{user.name}</h2>
+          <SEO title={user.name} description={`${user.name} — ${user.role === 'provider' ? 'Service Provider' : 'Customer'} on ALLFIX.`} noindex />
+          <h1 className="text-xl font-bold text-gray-900">{user.name}</h1>
           <p className="text-gray-500 text-sm capitalize">{user.role}</p>
         </div>
 
