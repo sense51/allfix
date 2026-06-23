@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
 import db from './db/index.js';
@@ -19,7 +20,9 @@ const isProd = process.env.NODE_ENV === 'production';
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',');
 app.use(cors({
   origin: isProd
-    ? allowedOrigins.filter(o => !o.includes('localhost') && !o.includes('127.0.0.1'))
+    ? allowedOrigins.filter(o => !o.includes('localhost') && !o.includes('127.0.0.1')).length > 0
+      ? allowedOrigins.filter(o => !o.includes('localhost') && !o.includes('127.0.0.1'))
+      : true
     : allowedOrigins,
   credentials: true,
 }));
@@ -61,11 +64,20 @@ app.get('/api/health', async (_, res) => {
   }
 });
 
-const clientDist = path.resolve(__dirname, '../../client/dist');
-app.use(express.static(clientDist));
-app.get('*', (_, res) => {
-  res.sendFile(path.join(clientDist, 'index.html'));
-});
+if (isProd) {
+  const clientDist = path.resolve(__dirname, '../../client/dist');
+  const clientIndex = path.join(clientDist, 'index.html');
+  if (fs.existsSync(clientIndex)) {
+    app.use(express.static(clientDist));
+    app.get('*', (_, res) => {
+      res.sendFile(clientIndex);
+    });
+  } else {
+    app.get('/api/*', (req, res) => {
+      res.status(404).json({ error: `API endpoint not found: ${req.method} ${req.originalUrl}` });
+    });
+  }
+}
 
 app.listen(PORT, HOST, () => {
   console.log(`Server running on http://${HOST}:${PORT} [${isProd ? 'production' : 'development'}]`);
