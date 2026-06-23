@@ -4,6 +4,8 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Services from './pages/Services';
 import ServiceDetail from './pages/ServiceDetail';
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 import ProviderDashboard from './pages/ProviderDashboard';
 import CustomerBookings from './pages/CustomerBookings';
 import Profile from './pages/Profile';
@@ -17,6 +19,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/services" element={<Services />} />
       <Route path="/services/:id" element={<ServiceDetail />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:id" element={<BlogDetail />} />
       <Route
         path="/provider/dashboard"
         element={

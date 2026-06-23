@@ -58,12 +58,14 @@ export default function Navbar() {
   const navLinks = user
     ? [
         { to: '/services', label: 'Browse' },
+        { to: '/blog',     label: 'Tips' },
         ...(user.role === 'provider' ? [{ to: '/provider/dashboard', label: 'Dashboard' }] : []),
         ...(user.role === 'customer' ? [{ to: '/customer/bookings', label: 'My Bookings' }] : []),
         { to: '/profile', label: user.name.split(' ')[0] },
       ]
     : [
         { to: '/services', label: 'Browse' },
+        { to: '/blog',     label: 'Tips' },
         { to: '/login',    label: 'Sign In' },
       ];
 
