@@ -16,6 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || '0.0.0.0';
 const isProd = process.env.NODE_ENV === 'production';
+const isVercel = !!process.env.VERCEL;
 
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',');
 app.use(cors({
@@ -79,6 +80,10 @@ if (isProd) {
   }
 }
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT} [${isProd ? 'production' : 'development'}]`);
-});
+if (!isVercel) {
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT} [${isProd ? 'production' : 'development'}]`);
+  });
+}
+
+export default app;
