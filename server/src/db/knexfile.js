@@ -16,9 +16,8 @@ const baseConfig = {
   },
 };
 
-export default isProd
+const prodConfig = process.env.DATABASE_URL
   ? {
-      ...baseConfig,
       client: 'pg',
       connection: {
         connectionString: process.env.DATABASE_URL,
@@ -27,15 +26,23 @@ export default isProd
       pool: { min: 2, max: 10 },
     }
   : {
-      ...baseConfig,
       client: 'sqlite3',
       connection: {
-        filename: path.resolve(__dirname, 'dev.sqlite3'),
+        filename: path.resolve('/tmp', 'allfix.sqlite3'),
       },
       useNullAsDefault: true,
-      pool: {
-        afterCreate: (conn, cb) => {
-          conn.run('PRAGMA foreign_keys = ON', cb);
-        },
-      },
     };
+
+export default isProd ? { ...baseConfig, ...prodConfig } : {
+  ...baseConfig,
+  client: 'sqlite3',
+  connection: {
+    filename: path.resolve(__dirname, 'dev.sqlite3'),
+  },
+  useNullAsDefault: true,
+  pool: {
+    afterCreate: (conn, cb) => {
+      conn.run('PRAGMA foreign_keys = ON', cb);
+    },
+  },
+};
