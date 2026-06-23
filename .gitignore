@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.sqlite3
+*.log
+client/dist/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
