@@ -7,3 +7,5 @@ client/dist/
 Thumbs.db
 *.swp
 *.swo
+
+.vercel
