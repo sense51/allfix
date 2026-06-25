@@ -35,7 +35,7 @@ exports.up = function (knex) {
         .inTable('providers')
         .onDelete('CASCADE');
       table
-        .enu('category', ['electric', 'motorcycle', 'car', 'cleaning'])
+        .enu('category', ['electric', 'motorcycle', 'car', 'cleaning'], { useNative: true, enumName: 'services_category_enum' })
         .notNullable();
       table.string('title').notNullable();
       table.text('description');
