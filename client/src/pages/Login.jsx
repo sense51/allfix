@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import SEO from '../components/SEO';
+import GoogleSignIn from '../components/GoogleSignIn';
 
 export default function Login() {
   const { login, sendOtp, verifyOtp } = useAuth();
@@ -180,9 +181,18 @@ export default function Login() {
               </form>
             )}
 
-            <p className="mt-5 text-center text-sm text-gray-500">
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/[0.06]" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-surface-50 px-3 text-gray-500">or continue with</span>
+              </div>
+            </div>
+            <GoogleSignIn label="signin" />
+            <p className="mt-5 text-center text-sm text-gray-400">
               Don't have an account?{' '}
-              <Link to="/register" className="text-brand-600 font-semibold hover:text-brand-700 transition-colors">
+              <Link to="/register" className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">
                 Create one
               </Link>
             </p>

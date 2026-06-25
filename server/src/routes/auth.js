@@ -2,7 +2,10 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import db from '../db/index.js';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const router = Router();
 
@@ -140,6 +143,53 @@ router.post('/verify-otp', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'OTP verification failed' });
+  }
+});
+
+router.post('/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required' });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await db('users').where({ email }).first();
+
+    if (user) {
+      await db('users').where({ id: user.id }).update({ google_id: googleId, avatar: picture });
+    } else {
+      const [created] = await db('users')
+        .insert({
+          name,
+          email,
+          google_id: googleId,
+          avatar: picture,
+          role: 'customer',
+          password: '',
+          password_set: false,
+        })
+        .returning(['id', 'name', 'email', 'role', 'phone', 'location', 'avatar']);
+      user = created;
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const { password: _, ...safe } = user;
+    res.json({ user: safe, token });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: 'Google authentication failed' });
   }
 });
 

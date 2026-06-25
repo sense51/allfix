@@ -1,7 +1,9 @@
+import storage, { KEYS } from '../utils/storage';
+
 const API = import.meta.env.VITE_API_URL || '/api';
 
 async function request(path, options = {}) {
-  const token = localStorage.getItem('token');
+  const token = storage.get(KEYS.TOKEN);
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -22,6 +24,7 @@ export const auth = {
   me: () => request('/auth/me'),
   sendOtp: (phone) => request('/auth/send-otp', { method: 'POST', body: JSON.stringify({ phone }) }),
   verifyOtp: (phone, otp) => request('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ phone, otp }) }),
+  google: (credential) => request('/auth/google', { method: 'POST', body: JSON.stringify({ credential }) }),
 };
 
 export const services = {
