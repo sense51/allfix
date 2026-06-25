@@ -18,7 +18,7 @@ function friendlyError(message) {
   return message || 'Google sign-in failed. Please try again.';
 }
 
-export default function GoogleSignIn({ label }) {
+export default function GoogleSignIn({ label, role }) {
   const { googleLogin } = useAuth();
   const navigate = useNavigate();
   const btnRef = useRef(null);
@@ -30,14 +30,14 @@ export default function GoogleSignIn({ label }) {
     setLoading(true);
     setError('');
     try {
-      await googleLogin(response.credential);
+      await googleLogin(response.credential, role);
       navigate('/');
     } catch (err) {
       setError(friendlyError(err.message));
     } finally {
       setLoading(false);
     }
-  }, [googleLogin, navigate, loading]);
+  }, [googleLogin, navigate, loading, role]);
 
   useEffect(() => {
     if (!CLIENT_ID) return;

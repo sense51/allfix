@@ -160,7 +160,7 @@ export default function Register() {
                 <span className="bg-surface-50 px-3 text-gray-500">or sign up with</span>
               </div>
             </div>
-            <GoogleSignIn label="signup" />
+            <GoogleSignIn label="signup" role={form.role} />
             <p className="mt-5 text-center text-sm text-gray-400">
               Already have an account?{' '}
               <Link to="/login" className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">

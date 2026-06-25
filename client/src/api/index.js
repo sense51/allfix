@@ -24,7 +24,7 @@ export const auth = {
   me: () => request('/auth/me'),
   sendOtp: (phone) => request('/auth/send-otp', { method: 'POST', body: JSON.stringify({ phone }) }),
   verifyOtp: (phone, otp) => request('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ phone, otp }) }),
-  google: (credential) => request('/auth/google', { method: 'POST', body: JSON.stringify({ credential }) }),
+  google: (credential, role) => request('/auth/google', { method: 'POST', body: JSON.stringify({ credential, role }) }),
 };
 
 export const services = {

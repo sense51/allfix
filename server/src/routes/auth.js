@@ -148,7 +148,7 @@ router.post('/verify-otp', async (req, res) => {
 
 router.post('/google', async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, role } = req.body;
     if (!credential) {
       return res.status(400).json({ error: 'Google credential is required' });
     }
@@ -177,17 +177,22 @@ router.post('/google', async (req, res) => {
         await db('users').where({ id: user.id }).update({ google_id: googleId, avatar: picture });
         user = await db('users').where({ id: user.id }).first();
       } else {
+        const targetRole = role === 'provider' ? 'provider' : 'customer';
         await db('users')
           .insert({
             name,
             email,
             google_id: googleId,
             avatar: picture,
-            role: 'customer',
+            role: targetRole,
             password: '',
             password_set: false,
           });
         user = await db('users').where({ email }).first();
+
+        if (targetRole === 'provider') {
+          await db('providers').insert({ user_id: user.id });
+        }
       }
     } catch (dbErr) {
       console.error('Database error during Google auth:', dbErr);
