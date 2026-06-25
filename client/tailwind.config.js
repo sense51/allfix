@@ -10,15 +10,18 @@ export default {
           200: '#ffc966',
           300: '#ffae1a',
           400: '#ff9500',
-          500: '#f97316',  /* vivid orange — ALLFIX primary */
+          500: '#f97316',
           600: '#ea6b0a',
           700: '#c05208',
           800: '#9a3f08',
           900: '#7c300a',
         },
         surface: {
-          50: '#faf8f5',
-          100: '#f5f0ea',
+          DEFAULT: '#131313',
+          50: '#1a1a1a',
+          100: '#1e1e1e',
+          200: '#252525',
+          300: '#2a2a2a',
         },
         neon: {
           orange: '#ff6a00',
@@ -44,10 +47,10 @@ export default {
         'glow-pulse':    'glowPulse 3s ease-in-out infinite',
         'spin-slow':     'spin 12s linear infinite',
         'beam':          'beam 4s ease-in-out infinite',
-        'typewriter':    'typewriter 2s steps(40) forwards',
-        'cursor-blink':  'cursorBlink 0.8s step-end infinite',
-        'orbit':         'orbit 8s linear infinite',
-        'slide-in-left': 'slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) forwards',
+        'grid-scan':     'gridScan 8s linear infinite',
+        'ambient-drift': 'ambientDrift 15s ease-in-out infinite',
+        'ambient-drift-reverse': 'ambientDrift 18s ease-in-out infinite reverse',
+        'line-sweep':    'lineSweep 4s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -65,10 +68,6 @@ export default {
         slideUp: {
           '0%':   { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        slideInLeft: {
-          '0%':   { opacity: '0', transform: 'translateX(-32px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         scaleIn: {
           '0%':   { opacity: '0', transform: 'scale(0.94)' },
@@ -95,19 +94,25 @@ export default {
           '40%':  { opacity: '1' },
           '100%': { opacity: '0', transform: 'scaleY(1)' },
         },
-        cursorBlink: {
-          '0%, 100%': { opacity: '1' },
-          '50%':      { opacity: '0' },
+        gridScan: {
+          '0%':   { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(40px)' },
         },
-        orbit: {
-          '0%':   { transform: 'rotate(0deg) translateX(60px) rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg) translateX(60px) rotate(-360deg)' },
+        ambientDrift: {
+          '0%':   { transform: 'translate(0, 0) scale(1)', opacity: '0.3' },
+          '33%':  { transform: 'translate(40px, -30px) scale(1.2)', opacity: '0.5' },
+          '66%':  { transform: 'translate(-20px, 25px) scale(0.9)', opacity: '0.2' },
+          '100%': { transform: 'translate(0, 0) scale(1)', opacity: '0.3' },
+        },
+        lineSweep: {
+          '0%':   { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
       backgroundImage: {
-        'grid-dark': "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-        'radial-glow': "radial-gradient(ellipse at center, rgba(249,115,22,0.15) 0%, transparent 70%)",
-        'dot-grid': "radial-gradient(circle, #d1d5db 0.5px, transparent 0.5px), radial-gradient(circle, #d1d5db 0.5px, transparent 0.5px)",
+        'grid-blueprint':
+          "linear-gradient(rgba(249,115,22,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,0.04) 1px, transparent 1px)",
+        'radial-glow': "radial-gradient(ellipse at center, rgba(249,115,22,0.12) 0%, transparent 70%)",
       },
     },
   },
