@@ -153,30 +153,47 @@ router.post('/google', async (req, res) => {
       return res.status(400).json({ error: 'Google credential is required' });
     }
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      console.error('Google token verification failed:', verifyErr.message);
+      return res.status(401).json({
+        error: 'Google token verification failed. Make sure the domain is authorized in Google Cloud Console.',
+      });
+    }
+
     const { sub: googleId, email, name, picture } = payload;
 
-    let user = await db('users').where({ email }).first();
+    let user;
+    try {
+      user = await db('users').where({ email }).first();
 
-    if (user) {
-      await db('users').where({ id: user.id }).update({ google_id: googleId, avatar: picture });
-    } else {
-      const [created] = await db('users')
-        .insert({
-          name,
-          email,
-          google_id: googleId,
-          avatar: picture,
-          role: 'customer',
-          password: '',
-          password_set: false,
-        })
-        .returning(['id', 'name', 'email', 'role', 'phone', 'location', 'avatar']);
-      user = created;
+      if (user) {
+        await db('users').where({ id: user.id }).update({ google_id: googleId, avatar: picture });
+      } else {
+        const [created] = await db('users')
+          .insert({
+            name,
+            email,
+            google_id: googleId,
+            avatar: picture,
+            role: 'customer',
+            password: '',
+            password_set: false,
+          })
+          .returning(['id', 'name', 'email', 'role', 'phone', 'location', 'avatar']);
+        user = created;
+      }
+    } catch (dbErr) {
+      console.error('Database error during Google auth:', dbErr.message);
+      return res.status(503).json({
+        error: 'Database unavailable. Please check that DATABASE_URL is configured.',
+      });
     }
 
     const token = jwt.sign(
@@ -188,8 +205,8 @@ router.post('/google', async (req, res) => {
     const { password: _, ...safe } = user;
     res.json({ user: safe, token });
   } catch (err) {
-    console.error(err);
-    res.status(401).json({ error: 'Google authentication failed' });
+    console.error('Unexpected Google auth error:', err);
+    res.status(500).json({ error: 'Google authentication failed' });
   }
 });
 
