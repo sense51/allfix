@@ -1,7 +1,7 @@
 exports.up = async function (knex) {
   if (knex.client.config.client !== 'sqlite3') {
-    await knex.schema.raw(`ALTER TYPE "public"."services_category_enum" ADD VALUE 'computer'`);
-    await knex.schema.raw(`ALTER TYPE "public"."services_category_enum" ADD VALUE 'phone'`);
+    await knex.schema.raw(`ALTER TYPE "public"."services_category_enum" ADD VALUE IF NOT EXISTS 'computer'`);
+    await knex.schema.raw(`ALTER TYPE "public"."services_category_enum" ADD VALUE IF NOT EXISTS 'phone'`);
   }
 };
 
