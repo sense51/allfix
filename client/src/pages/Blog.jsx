@@ -30,7 +30,7 @@ export default function Blog() {
         canonical="https://sense51.github.io/allfix/blog"
       />
       <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-2xl font-bold text-gray-900">Tips & Guides</h1>
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">Tips & Guides</h1>
         <p className="text-gray-500 mt-1.5">Home repair advice and troubleshooting guides</p>
       </div>
 

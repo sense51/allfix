@@ -60,7 +60,7 @@ export default function BlogDetail() {
           </div>
           <h1 className="text-lg font-semibold text-gray-900">Article not found</h1>
           <Link to="/blog" className="text-brand-600 hover:text-brand-700 font-semibold text-sm mt-2 inline-block transition-colors">
-            &larr; Back to Tips & Guides
+            &larr; Back to <span className="bg-gradient-to-r from-amber-300 to-yellow-400 bg-clip-text text-transparent font-bold">Tips & Guides</span>
           </Link>
         </div>
       </Layout>
@@ -93,7 +93,7 @@ export default function BlogDetail() {
           to="/blog"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-brand-600 transition-colors mb-6"
         >
-          &larr; Back to Tips & Guides
+          &larr; Back to <span className="bg-gradient-to-r from-amber-300 to-yellow-400 bg-clip-text text-transparent font-bold">Tips & Guides</span>
         </Link>
 
         <article className="animate-fade-in-up">
