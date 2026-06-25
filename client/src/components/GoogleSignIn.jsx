@@ -1,14 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+const ERROR_MESSAGES = {
+  'google token verification failed': 'Google sign-in failed. Please ensure the domain is authorized in the Google Cloud Console (Authorized JavaScript origins).',
+  'database unavailable': 'Could not connect to the server. Please try again.',
+  'database error': 'Something went wrong. Please try signing in again.',
+};
+
+function friendlyError(message) {
+  const lower = message.toLowerCase();
+  for (const [key, val] of Object.entries(ERROR_MESSAGES)) {
+    if (lower.includes(key)) return val;
+  }
+  return message || 'Google sign-in failed. Please try again.';
+}
 
 export default function GoogleSignIn({ label }) {
   const { googleLogin } = useAuth();
   const navigate = useNavigate();
   const btnRef = useRef(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleCallback = useCallback(async (response) => {
+    if (loading) return;
+    setLoading(true);
+    setError('');
+    try {
+      await googleLogin(response.credential);
+      navigate('/');
+    } catch (err) {
+      setError(friendlyError(err.message));
+    } finally {
+      setLoading(false);
+    }
+  }, [googleLogin, navigate, loading]);
 
   useEffect(() => {
     if (!CLIENT_ID) return;
@@ -17,14 +46,7 @@ export default function GoogleSignIn({ label }) {
       if (!window.google?.accounts?.id) return;
       window.google.accounts.id.initialize({
         client_id: CLIENT_ID,
-        callback: async (response) => {
-          try {
-            await googleLogin(response.credential);
-            navigate('/');
-          } catch (err) {
-            setError(err.message);
-          }
-        },
+        callback: handleCallback,
         cancel_on_tap_outside: false,
       });
       if (btnRef.current) {
@@ -51,7 +73,7 @@ export default function GoogleSignIn({ label }) {
       }, 100);
       return () => clearInterval(check);
     }
-  }, [googleLogin, navigate, label]);
+  }, [handleCallback, label]);
 
   if (!CLIENT_ID) {
     return (
@@ -63,7 +85,10 @@ export default function GoogleSignIn({ label }) {
 
   return (
     <div>
-      <div ref={btnRef} className="flex justify-center min-h-[40px]" />
+      <div ref={btnRef} className={`flex justify-center min-h-[40px] ${loading ? 'opacity-50 pointer-events-none' : ''}`} />
+      {loading && (
+        <p className="text-xs text-gray-400 text-center mt-2">Signing in...</p>
+      )}
       {error && (
         <p className="text-xs text-red-400 text-center mt-2">{error}</p>
       )}

@@ -22,13 +22,18 @@ function getDb() {
   return instance;
 }
 
-const db = new Proxy({}, {
+const db = new Proxy(function() {}, {
+  apply(target, thisArg, argumentsList) {
+    const d = getDb();
+    return d(...argumentsList);
+  },
   get(_, prop) {
     const d = getDb();
-    if (typeof d[prop] === 'function') {
-      return (...args) => d[prop](...args);
+    const value = d[prop];
+    if (typeof value === 'function') {
+      return value.bind(d);
     }
-    return d[prop];
+    return value;
   }
 });
 

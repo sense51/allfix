@@ -175,8 +175,9 @@ router.post('/google', async (req, res) => {
 
       if (user) {
         await db('users').where({ id: user.id }).update({ google_id: googleId, avatar: picture });
+        user = await db('users').where({ id: user.id }).first();
       } else {
-        const [created] = await db('users')
+        await db('users')
           .insert({
             name,
             email,
@@ -185,14 +186,13 @@ router.post('/google', async (req, res) => {
             role: 'customer',
             password: '',
             password_set: false,
-          })
-          .returning(['id', 'name', 'email', 'role', 'phone', 'location', 'avatar']);
-        user = created;
+          });
+        user = await db('users').where({ email }).first();
       }
     } catch (dbErr) {
-      console.error('Database error during Google auth:', dbErr.message);
+      console.error('Database error during Google auth:', dbErr);
       return res.status(503).json({
-        error: 'Database unavailable. Please check that DATABASE_URL is configured.',
+        error: `Database error: ${dbErr.message}. Please check that DATABASE_URL is configured and migrations have been run.`,
       });
     }
 

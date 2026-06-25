@@ -16,11 +16,13 @@ const baseConfig = {
   },
 };
 
-const prodConfig = process.env.DATABASE_URL
+const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+
+const prodConfig = dbUrl
   ? {
       client: 'pg',
       connection: {
-        connectionString: process.env.DATABASE_URL,
+        connectionString: dbUrl,
         ssl: { rejectUnauthorized: false },
       },
       pool: { min: 2, max: 10 },
