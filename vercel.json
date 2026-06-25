@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node node_modules/knex/bin/cli.js migrate:latest --knexfile server/src/db/knexfile.js && npm --prefix client run build",
+  "buildCommand": "node run_migrations.js && npm --prefix client run build",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
