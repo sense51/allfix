@@ -139,7 +139,7 @@ function Counter({ stat, index }) {
       <div className="text-3xl font-extrabold text-gray-100 tracking-tight tabular-nums">
         {val}{stat.suffix}
       </div>
-      <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">{stat.label}</div>
+      <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">{stat.label}</div>
     </div>
   );
 }
@@ -208,7 +208,7 @@ export default function Landing() {
             </h1>
 
             <p
-              className="mt-6 text-lg text-gray-400 max-w-xl leading-relaxed animate-fade-in-up"
+              className="mt-6 text-lg text-gray-300 max-w-xl leading-relaxed animate-fade-in-up"
               style={{ animationDelay: '160ms' }}
             >
               Find verified professionals for electrical, automotive, cleaning, computer & phone repair.
@@ -322,7 +322,7 @@ export default function Landing() {
                   >
                     {cat.label}
                   </h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{cat.desc}</p>
+                  <p className="text-sm text-gray-300 leading-relaxed">{cat.desc}</p>
 
                   {/* Arrow reveal */}
                   <div
@@ -413,7 +413,7 @@ export default function Landing() {
                     {item.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{item.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+                  <p className="text-sm text-gray-300 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -435,7 +435,7 @@ export default function Landing() {
                   Are you a skilled<br />
                   <span className="text-brand-400">professional?</span>
                 </h2>
-                <p className="text-gray-400 max-w-md mx-auto mb-10 leading-relaxed">
+                <p className="text-gray-300 max-w-md mx-auto mb-10 leading-relaxed">
                   Join ALLFIX and start earning by offering your services to customers in your area.
                   Free to join, no setup fees.
                 </p>
@@ -453,8 +453,8 @@ export default function Landing() {
 
           {/* ── FOOTER ───────────────────────────────────── */}
           <footer className="text-center py-8 border-t border-white/[0.06]">
-            <p className="text-gray-500 text-sm">
-              © 2026 <span className="text-gray-300 font-semibold">ALLFIX</span>. All rights reserved.
+            <p className="text-gray-400 text-sm">
+              © 2026 <span className="text-gray-200 font-semibold">ALLFIX</span>. All rights reserved.
             </p>
           </footer>
         </div>
