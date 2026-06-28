@@ -77,17 +77,21 @@ router.post('/', authenticate, requireRole('provider'), async (req, res) => {
     const provider = await db('providers').where({ user_id: req.user.id }).first();
     if (!provider) return res.status(404).json({ error: 'Provider profile not found' });
 
-    const [service] = await db('services')
-      .insert({
-        provider_id: provider.id,
-        category,
-        title,
-        description,
-        price: Number(price),
-        currency: currency || 'USD',
-        duration_minutes: Number(duration_minutes),
-      })
-      .returning('*');
+    // SQLite-safe: insert then re-select by provider_id + title + created_at DESC
+    await db('services').insert({
+      provider_id: provider.id,
+      category,
+      title,
+      description,
+      price: Number(price),
+      currency: currency || 'USD',
+      duration_minutes: Number(duration_minutes),
+    });
+
+    const service = await db('services')
+      .where({ provider_id: provider.id, title, category })
+      .orderBy('created_at', 'desc')
+      .first();
 
     res.status(201).json(service);
   } catch (err) {
@@ -109,17 +113,17 @@ router.put('/:id', authenticate, requireRole('provider'), async (req, res) => {
 
     const { category, title, description, price, currency, duration_minutes } = req.body;
 
-    const [updated] = await db('services')
-      .where({ id: serviceId })
-      .update({
-        category,
-        title,
-        description,
-        price: Number(price),
-        currency: currency || 'USD',
-        duration_minutes: Number(duration_minutes),
-      })
-      .returning('*');
+    // SQLite-safe: update then re-select by id
+    await db('services').where({ id: serviceId }).update({
+      category,
+      title,
+      description,
+      price: Number(price),
+      currency: currency || 'USD',
+      duration_minutes: Number(duration_minutes),
+    });
+
+    const updated = await db('services').where({ id: serviceId }).first();
 
     res.json(updated);
   } catch (err) {

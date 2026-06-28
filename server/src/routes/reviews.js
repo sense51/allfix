@@ -85,9 +85,9 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(409).json({ error: 'You have already reviewed this booking' });
     }
 
-    const [review] = await db('reviews')
-      .insert({ booking_id, rating: ratingNum, comment: comment || null })
-      .returning('*');
+    // SQLite-safe: insert then re-select by booking_id
+    await db('reviews').insert({ booking_id, rating: ratingNum, comment: comment || null });
+    const review = await db('reviews').where({ booking_id }).first();
 
     // Recalculate and update provider's avg_rating
     const service = await db('services').where({ id: booking.service_id }).first();

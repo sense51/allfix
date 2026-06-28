@@ -7,28 +7,28 @@ import SEO from '../components/SEO';
 import { formatPrice } from '../utils/currency';
 
 const categoryConfig = {
-  electric:  { label: 'Electrical',     gradient: 'from-brand-500 to-brand-600'   },
-  motorcycle:{ label: 'Motorcycle',     gradient: 'from-rose-500 to-pink-600'    },
-  car:       { label: 'Automotive',     gradient: 'from-sky-500 to-blue-600'     },
-  cleaning:  { label: 'Cleaning',       gradient: 'from-emerald-500 to-green-600'},
-  computer:  { label: 'Computer Repair',gradient: 'from-violet-500 to-purple-600'},
-  phone:     { label: 'Phone Repair',   gradient: 'from-teal-500 to-cyan-600'   },
+  electric:   { label: 'Electrical',     accent: '#818cf8', glow: 'rgba(129,140,248,0.15)' },
+  motorcycle: { label: 'Motorcycle',     accent: '#f43f5e', glow: 'rgba(244,63,94,0.15)'   },
+  car:        { label: 'Automotive',     accent: '#22d3ee', glow: 'rgba(34,211,238,0.15)'  },
+  cleaning:   { label: 'Cleaning',       accent: '#34d399', glow: 'rgba(52,211,153,0.15)'  },
+  computer:   { label: 'Computer Repair',accent: '#a78bfa', glow: 'rgba(167,139,250,0.15)' },
+  phone:      { label: 'Phone Repair',   accent: '#2dd4bf', glow: 'rgba(45,212,191,0.15)'  },
 };
 
 export default function ServiceDetail() {
-  const { id } = useParams();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [bookingDate, setBookingDate] = useState('');
+  const { id }    = useParams();
+  const { user }  = useAuth();
+  const navigate  = useNavigate();
+  const [service,      setService]      = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [bookingDate,  setBookingDate]  = useState('');
   const [bookingNotes, setBookingNotes] = useState('');
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('success');
+  const [message,      setMessage]      = useState('');
+  const [msgType,      setMsgType]      = useState('success');
+  const [booking,      setBooking]      = useState(false);
 
   useEffect(() => {
-    servicesApi
-      .get(id)
+    servicesApi.get(id)
       .then(setService)
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -36,204 +36,238 @@ export default function ServiceDetail() {
 
   const handleBook = async (e) => {
     e.preventDefault();
-    if (!user) return navigate('/login');
+    if (!user) return navigate('/customer/login');
+    setBooking(true);
     try {
-      await bookingsApi.create({
-        service_id: Number(id),
-        scheduled_at: bookingDate,
-        notes: bookingNotes,
-      });
-      setMessageType('success');
+      await bookingsApi.create({ service_id: Number(id), scheduled_at: bookingDate, notes: bookingNotes });
+      setMsgType('success');
       setMessage('Booking confirmed! Check your bookings page.');
       setBookingDate('');
       setBookingNotes('');
     } catch (err) {
-      setMessageType('error');
+      setMsgType('error');
       setMessage(err.message);
+    } finally {
+      setBooking(false);
     }
   };
 
-  if (loading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 border-2 border-gray-200 border-t-brand-500 rounded-full animate-spin" />
-            <div className="skeleton h-4 w-40" />
-          </div>
+  if (loading) return (
+    <Layout>
+      <div className="flex items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-white/10 border-t-brand-500 rounded-full animate-spin" />
+          <div className="skeleton h-4 w-40" />
         </div>
-      </Layout>
-    );
-  }
+      </div>
+    </Layout>
+  );
 
-  if (!service) {
-    return (
-      <Layout>
-        <div className="text-center py-20 animate-scale-in">
-          <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">Service not found</h3>
-          <Link to="/services" className="text-brand-600 hover:text-brand-700 font-semibold text-sm mt-2 inline-block transition-colors">
-            &larr; Browse services
-          </Link>
+  if (!service) return (
+    <Layout>
+      <div className="text-center py-24 animate-scale-in">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/[0.07]"
+          style={{ background: 'rgba(13,13,20,0.8)' }}>
+          <svg className="w-7 h-7 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+            <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
-      </Layout>
-    );
-  }
+        <h3 className="text-lg font-bold text-slate-300 mb-2">Service not found</h3>
+        <Link to="/services" className="text-brand-400 hover:text-brand-300 font-semibold text-sm transition-colors">
+          ← Browse all services
+        </Link>
+      </div>
+    </Layout>
+  );
 
   const cfg = categoryConfig[service.category] || categoryConfig.car;
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: service.title,
-    description: service.description,
-    provider: {
-      '@type': 'LocalBusiness',
-      name: service.provider_name,
-      address: service.location ? { '@type': 'PostalAddress', addressLocality: service.location } : undefined,
-    },
-    offers: {
-      '@type': 'Offer',
-      price: service.price,
-      priceCurrency: service.currency || 'USD',
-    },
-    category: service.category,
-  };
+  const minDate = new Date(Date.now() + 60 * 60 * 1000).toISOString().slice(0, 16);
 
   return (
     <Layout>
       <SEO
-        title={service.title}
-        description={`${service.title} — ${service.description?.slice(0, 150)}. Book ${service.provider_name} on ALLFIX.`}
-        canonical={`https://sense51.github.io/allfix/services/${service.id}`}
+        title={`${service.title} — ALLFIX`}
+        description={service.description || `Book ${service.title} by ${service.provider_name}. ${formatPrice(service.price, service.currency)} / ${service.duration_minutes} min.`}
       />
-      <script type="application/ld+json">
-        {JSON.stringify(jsonLd)}
-      </script>
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link to="/services" className="hover:text-brand-600 transition-colors">Services</Link>
-          <span className="text-gray-300">/</span>
-          <span className="text-gray-600 font-medium">{service.title}</span>
-        </div>
 
-        <div className="grid lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-3 space-y-6">
-            <div className="card p-6 animate-fade-in-up">
-              <div className="flex items-start justify-between mb-4">
-                <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${cfg.gradient} text-white`}>
+      {/* Back */}
+      <Link to="/services" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-300 mb-8 transition-colors animate-fade-in">
+        <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 12L6 8l4-4" />
+        </svg>
+        All services
+      </Link>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* ── Main info ── */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Hero card */}
+          <div
+            className="relative overflow-hidden rounded-3xl p-8 border border-white/[0.07] animate-fade-in-up"
+            style={{
+              background: 'rgba(13,13,20,0.9)',
+              boxShadow: `0 0 60px ${cfg.glow}, 0 30px 60px rgba(0,0,0,0.4)`,
+            }}
+          >
+            {/* Glow orb */}
+            <div
+              className="absolute top-0 right-0 w-64 h-64 rounded-full pointer-events-none"
+              style={{
+                background: `radial-gradient(circle at center, ${cfg.glow}, transparent 70%)`,
+                transform: 'translate(20%, -20%)',
+              }}
+            />
+
+            <div className="relative z-10">
+              {/* Category + rating */}
+              <div className="flex items-center gap-3 mb-5">
+                <span
+                  className="badge text-[11px]"
+                  style={{ background: `${cfg.accent}14`, color: cfg.accent, border: `1px solid ${cfg.accent}30` }}
+                >
                   {cfg.label}
                 </span>
                 {service.avg_rating > 0 && (
-                  <span className="flex items-center gap-1 text-sm text-yellow-700 bg-yellow-50 px-2.5 py-1 rounded-full border border-yellow-200">
-                    <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <span className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    {service.avg_rating}
+                    {Number(service.avg_rating).toFixed(1)}
                   </span>
                 )}
               </div>
 
-              <h1 className="text-xl font-bold text-gray-900">{service.title}</h1>
-              <p className="text-gray-600 mt-3 leading-relaxed text-sm">{service.description}</p>
+              <h1 className="text-3xl font-black text-slate-100 mb-3">{service.title}</h1>
+              {service.description && (
+                <p className="text-slate-400 leading-relaxed">{service.description}</p>
+              )}
 
-              <div className="mt-6 flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+              {/* Price + duration row */}
+              <div className="flex items-center gap-6 mt-6 pt-6 border-t border-white/[0.06]">
                 <div>
-                  <span className="text-xs text-gray-500 font-medium">Price</span>
-                  <div className="text-2xl font-bold text-gray-900">{formatPrice(service.price, service.currency)}</div>
+                  <p className="text-xs text-slate-600 mb-1">Price</p>
+                  <p className="text-2xl font-black text-slate-100">{formatPrice(service.price, service.currency)}</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs text-gray-500 font-medium">Duration</span>
-                  <div className="text-sm font-semibold text-gray-700 flex items-center gap-1 mt-0.5">
-                    ~{service.duration_minutes} min
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="card p-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <span className="w-0.5 h-3.5 bg-brand-500 rounded-full" />
-                Service Provider
-              </h3>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-brand-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-sm">
-                  {service.provider_name?.charAt(0).toUpperCase()}
-                </div>
+                <div className="w-px h-10 bg-white/[0.07]" />
                 <div>
-                  <h4 className="font-semibold text-gray-900">{service.provider_name}</h4>
-                  {service.location && (
-                    <p className="text-sm text-gray-500 mt-0.5">{service.location}</p>
-                  )}
-                  {service.bio && (
-                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">{service.bio}</p>
-                  )}
+                  <p className="text-xs text-slate-600 mb-1">Duration</p>
+                  <p className="text-2xl font-black text-slate-100">{service.duration_minutes}m</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-2">
-            <div className="card p-6 sticky top-24 animate-fade-in-up" style={{ animationDelay: '150ms' }}>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-0.5 h-4 bg-brand-500 rounded-full" />
-                {user?.role === 'customer' ? 'Book This Service' : 'Want to book?'}
-              </h3>
-
-              {message && (
-                <div className={`mb-4 px-4 py-3 rounded-xl text-sm flex items-center gap-2 ${
-                  messageType === 'success'
-                    ? 'bg-green-50 border border-green-200 text-green-700'
-                    : 'bg-red-50 border border-red-200 text-red-700'
-                }`}>
-                  {message}
-                </div>
-              )}
-
-              {!user ? (
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-500">Sign in to book this service.</p>
-                  <Link to="/customer/login" className="btn-primary w-full text-center !py-3 text-sm">Sign In</Link>
-                  <Link to="/register" className="btn-secondary w-full text-center !py-3 text-sm">Create Account</Link>
-                </div>
-              ) : user.role === 'customer' ? (
-                <form onSubmit={handleBook} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Date & Time</label>
-                    <input
-                      type="datetime-local"
-                      required
-                      value={bookingDate}
-                      onChange={(e) => setBookingDate(e.target.value)}
-                      className="input-field"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Notes</label>
-                    <textarea
-                      value={bookingNotes}
-                      onChange={(e) => setBookingNotes(e.target.value)}
-                      className="input-field"
-                      rows={3}
-                      placeholder="Describe the issue..."
-                    />
-                  </div>
-                  <button type="submit" className="btn-primary w-full !py-3">
-                    Confirm Booking
-                  </button>
-                </form>
-              ) : (
-                <div className="text-sm text-gray-500 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                  <p className="font-medium text-gray-700 mb-1">You're a provider</p>
-                  <p>Switch to a customer account to book services.</p>
-                </div>
-              )}
+          {/* Provider info */}
+          <div
+            className="rounded-2xl p-6 border border-white/[0.07] animate-fade-in-up"
+            style={{ background: 'rgba(13,13,20,0.8)', animationDelay: '80ms' }}
+          >
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-4">About the provider</h2>
+            <div className="flex items-center gap-4">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-lg flex-shrink-0"
+                style={{ background: cfg.accent }}
+              >
+                {service.provider_name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-slate-100">{service.provider_name}</p>
+                {service.location && <p className="text-sm text-slate-500 flex items-center gap-1 mt-0.5">
+                  <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 flex-shrink-0" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M8 1.5C5.79 1.5 4 3.29 4 5.5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z" />
+                    <circle cx="8" cy="5.5" r="1.5" />
+                  </svg>
+                  {service.location}
+                </p>}
+                {service.phone && <p className="text-sm text-slate-500 mt-0.5">{service.phone}</p>}
+              </div>
             </div>
+            {service.bio && (
+              <p className="text-sm text-slate-500 mt-4 leading-relaxed border-t border-white/[0.06] pt-4">{service.bio}</p>
+            )}
+          </div>
+        </div>
+
+        {/* ── Booking panel ── */}
+        <div className="lg:col-span-1">
+          <div
+            className="sticky top-24 rounded-2xl p-6 border border-white/[0.08] animate-fade-in-up"
+            style={{
+              background: 'rgba(16,16,26,0.95)',
+              boxShadow: `0 30px 60px rgba(0,0,0,0.4), 0 0 40px ${cfg.glow}`,
+              animationDelay: '120ms',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse-soft" style={{ background: cfg.accent }} />
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">Book This Service</span>
+            </div>
+
+            <div className="text-3xl font-black text-slate-100 mb-1">{formatPrice(service.price, service.currency)}</div>
+            <p className="text-xs text-slate-500 mb-6">{service.duration_minutes} minute session</p>
+
+            {/* Message */}
+            {message && (
+              <div
+                className={`mb-4 px-4 py-3 rounded-xl text-sm border ${
+                  msgType === 'success'
+                    ? 'text-emerald-400 border-emerald-900/30 bg-emerald-950/20'
+                    : 'text-red-400 border-red-900/30 bg-red-950/20'
+                }`}
+              >
+                {message}
+              </div>
+            )}
+
+            {user?.role === 'customer' ? (
+              <form onSubmit={handleBook} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    required
+                    min={minDate}
+                    value={bookingDate}
+                    onChange={e => setBookingDate(e.target.value)}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Notes (optional)</label>
+                  <textarea
+                    rows={3}
+                    value={bookingNotes}
+                    onChange={e => setBookingNotes(e.target.value)}
+                    className="input-field resize-none"
+                    placeholder="Describe the issue or any special instructions…"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={booking}
+                  className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                  style={{
+                    background: `linear-gradient(135deg, ${cfg.accent}, #6366f1)`,
+                    boxShadow: `0 0 24px ${cfg.glow}`,
+                    opacity: booking ? 0.6 : 1,
+                  }}
+                >
+                  {booking ? 'Booking…' : 'Confirm Booking'}
+                </button>
+              </form>
+            ) : user?.role === 'provider' ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-slate-500">Providers cannot book services.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Link to="/customer/login" className="block w-full text-center py-3.5 rounded-xl text-sm font-bold text-white transition-all"
+                  style={{ background: `linear-gradient(135deg, ${cfg.accent}, #6366f1)` }}>
+                  Sign in to book
+                </Link>
+                <Link to="/register" className="block w-full text-center btn-secondary !py-3">Create free account</Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

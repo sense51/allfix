@@ -9,6 +9,12 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const router = Router();
 
+/**
+ * In-memory OTP store.
+ * NOTE: On Vercel serverless, each invocation may be a cold start with a fresh
+ * in-memory store, so OTPs sent in one invocation may not be visible in another.
+ * For production reliability, replace with a Redis/DB-backed store.
+ */
 const otpStore = new Map();
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -28,9 +34,12 @@ router.post('/register', async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const [user] = await db('users')
-      .insert({ name, email, password: hashed, role, phone, location })
-      .returning(['id', 'name', 'email', 'role', 'phone', 'location']);
+    // SQLite does not support .returning() — insert then re-select by email.
+    await db('users').insert({ name, email, password: hashed, role, phone, location });
+    const user = await db('users')
+      .where({ email })
+      .select('id', 'name', 'email', 'role', 'phone', 'location')
+      .first();
 
     if (role === 'provider') {
       await db('providers').insert({ user_id: user.id });
@@ -178,16 +187,16 @@ router.post('/google', async (req, res) => {
         user = await db('users').where({ id: user.id }).first();
       } else {
         const targetRole = role === 'provider' ? 'provider' : 'customer';
-        await db('users')
-          .insert({
-            name,
-            email,
-            google_id: googleId,
-            avatar: picture,
-            role: targetRole,
-            password: '',
-            password_set: false,
-          });
+        // SQLite-safe: insert then re-select. Password is empty string for Google users.
+        await db('users').insert({
+          name,
+          email,
+          google_id: googleId,
+          avatar: picture,
+          role: targetRole,
+          password: '',
+          password_set: false,
+        });
         user = await db('users').where({ email }).first();
 
         if (targetRole === 'provider') {

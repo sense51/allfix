@@ -73,15 +73,19 @@ router.post('/', authenticate, async (req, res) => {
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    const [booking] = await db('bookings')
-      .insert({
-        service_id,
-        customer_id: req.user.id,
-        scheduled_at,
-        notes,
-        otp,
-      })
-      .returning('*');
+    // SQLite-safe: insert then re-select by composite key (customer_id + service_id + created_at max)
+    await db('bookings').insert({
+      service_id,
+      customer_id: req.user.id,
+      scheduled_at,
+      notes,
+      otp,
+    });
+
+    const booking = await db('bookings')
+      .where({ service_id, customer_id: req.user.id })
+      .orderBy('created_at', 'desc')
+      .first();
 
     res.status(201).json(booking);
   } catch (err) {
@@ -135,10 +139,9 @@ router.patch('/:id/status', authenticate, async (req, res) => {
       }
     }
 
-    const [updated] = await db('bookings')
-      .where({ id: req.params.id })
-      .update({ status })
-      .returning('*');
+    // SQLite-safe: update then re-select the updated row
+    await db('bookings').where({ id: req.params.id }).update({ status });
+    const updated = await db('bookings').where({ id: req.params.id }).first();
 
     res.json(updated);
   } catch (err) {
