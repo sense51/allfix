@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import SEO from '../components/SEO';
@@ -8,12 +8,17 @@ import GoogleSignIn from '../components/GoogleSignIn';
 export default function Login() {
   const { login, sendOtp, verifyOtp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const role = useMemo(() => location.pathname.includes('provider') ? 'provider' : 'customer', [location.pathname]);
   const [mode, setMode] = useState('password');
   const [form, setForm] = useState({ email: '', password: '', phone: '', otp: '' });
   const [error, setError] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
+
+  const isProvider = role === 'provider';
+  const label = isProvider ? 'Provider' : 'Customer';
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -22,7 +27,7 @@ export default function Login() {
     setError('');
     try {
       await login(form.email, form.password);
-      navigate('/');
+      navigate(isProvider ? '/provider/dashboard' : '/');
     } catch (err) {
       setError(err.message);
     }
@@ -48,7 +53,7 @@ export default function Login() {
     setVerifying(true);
     try {
       await verifyOtp(form.phone, form.otp);
-      navigate('/');
+      navigate(isProvider ? '/provider/dashboard' : '/');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -61,16 +66,25 @@ export default function Login() {
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-brand-500 rounded-2xl flex items-center justify-center text-white text-lg font-bold mx-auto shadow-sm mb-4">
-              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white text-lg font-bold mx-auto shadow-sm mb-4 ${isProvider ? 'bg-gradient-to-br from-brand-500 to-neon-orange' : 'bg-brand-500'}`}>
+              {isProvider ? (
+                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                  <path d="M9 9l2 2 4-4" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+              )}
             </div>
-            <SEO title="Sign In" description="Sign in to your ALLFIX account to manage bookings or services." noindex />
-            <h1 className="text-xl font-bold text-gray-900">Welcome back</h1>
-            <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
+            <SEO title={`${label} Sign In`} description={`Sign in to your ALLFIX ${label.toLowerCase()} account.`} noindex />
+            <h1 className="text-xl font-bold text-gray-900">{isProvider ? 'Provider Sign In' : 'Welcome back'}</h1>
+            <p className="text-gray-500 text-sm mt-1">{isProvider ? 'Access your dashboard and manage bookings' : 'Sign in to your account'}</p>
           </div>
 
           <div className="card p-6">
@@ -189,13 +203,29 @@ export default function Login() {
                 <span className="bg-surface-50 px-3 text-gray-500">or continue with</span>
               </div>
             </div>
-            <GoogleSignIn label="signin" />
+            <GoogleSignIn label="signin" role={role} />
             <p className="mt-5 text-center text-sm text-gray-400">
-              Don't have an account?{' '}
+              {isProvider ? "Don't have a provider account? " : "Don't have an account? "}
               <Link to="/register" className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">
                 Create one
               </Link>
             </p>
+            {!isProvider && (
+              <p className="mt-2 text-center text-sm text-gray-400">
+                Are you a provider?{' '}
+                <Link to="/provider/login" className="text-brand-500 font-semibold hover:text-brand-400 transition-colors">
+                  Sign in here
+                </Link>
+              </p>
+            )}
+            {isProvider && (
+              <p className="mt-2 text-center text-sm text-gray-400">
+                Are you a customer?{' '}
+                <Link to="/customer/login" className="text-brand-500 font-semibold hover:text-brand-400 transition-colors">
+                  Sign in here
+                </Link>
+              </p>
+            )}
           </div>
         </div>
       </div>

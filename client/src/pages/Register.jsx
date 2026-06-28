@@ -24,8 +24,8 @@ export default function Register() {
     e.preventDefault();
     setError('');
     try {
-      await register(form);
-      navigate('/');
+      const user = await register(form);
+      navigate(user.role === 'provider' ? '/provider/dashboard' : '/');
     } catch (err) {
       setError(err.message);
     }
@@ -163,7 +163,7 @@ export default function Register() {
             <GoogleSignIn label="signup" role={form.role} />
             <p className="mt-5 text-center text-sm text-gray-400">
               Already have an account?{' '}
-              <Link to="/login" className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">
+              <Link to={form.role === 'provider' ? '/provider/login' : '/customer/login'} className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">
                 Sign in
               </Link>
             </p>

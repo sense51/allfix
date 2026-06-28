@@ -30,8 +30,8 @@ export default function GoogleSignIn({ label, role }) {
     setLoading(true);
     setError('');
     try {
-      await googleLogin(response.credential, role);
-      navigate('/');
+      const user = await googleLogin(response.credential, role);
+      navigate(user.role === 'provider' ? '/provider/dashboard' : '/');
     } catch (err) {
       setError(friendlyError(err.message));
     } finally {

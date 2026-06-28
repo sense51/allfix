@@ -198,7 +198,7 @@ export default function ServiceDetail() {
               {!user ? (
                 <div className="space-y-3">
                   <p className="text-sm text-gray-500">Sign in to book this service.</p>
-                  <Link to="/login" className="btn-primary w-full text-center !py-3 text-sm">Sign In</Link>
+                  <Link to="/customer/login" className="btn-primary w-full text-center !py-3 text-sm">Sign In</Link>
                   <Link to="/register" className="btn-secondary w-full text-center !py-3 text-sm">Create Account</Link>
                 </div>
               ) : user.role === 'customer' ? (

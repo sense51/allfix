@@ -66,7 +66,7 @@ export default function Navbar() {
     : [
         { to: '/services', label: 'Browse' },
         { to: '/blog',     label: 'Tips' },
-        { to: '/login',    label: 'Sign In' },
+        { to: '/customer/login', label: 'Sign In' },
       ];
 
   return (

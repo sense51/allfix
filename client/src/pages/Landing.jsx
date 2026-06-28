@@ -447,6 +447,12 @@ export default function Landing() {
                   <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center
                                    group-hover:translate-x-0.5 transition-transform">→</span>
                 </Link>
+                <p className="mt-4 text-sm text-gray-400">
+                  Already registered?{' '}
+                  <Link to="/provider/login" className="text-brand-400 font-semibold hover:text-brand-300 transition-colors">
+                    Sign in here
+                  </Link>
+                </p>
               </div>
             </section>
           )}
